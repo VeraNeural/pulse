@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { getStripe } from '@/lib/stripe';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface CoinsModalProps {
@@ -47,19 +46,15 @@ export function BuyCoinsModal({ isOpen, onClose, balance, onPurchase }: CoinsMod
         }),
       });
 
-      const { sessionId, error } = await response.json();
+      const { url, error } = await response.json();
 
       if (error) {
         throw new Error(error);
       }
 
-      // Redirect to Stripe checkout
-      const stripe = await getStripe();
-      if (stripe) {
-        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
-        if (stripeError) {
-          throw new Error(stripeError.message);
-        }
+      if (url) {
+        // Redirect to Stripe checkout
+        window.location.href = url;
       }
     } catch (error) {
       console.error('Purchase error:', error);

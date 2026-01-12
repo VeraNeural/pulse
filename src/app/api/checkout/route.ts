@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       metadata: { userId, coins: coins.toString() },
     });
     
-    return NextResponse.json({ sessionId: session.id });
+    return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('Checkout error:', error);
     return NextResponse.json({ error: 'Failed to create checkout' }, { status: 500 });
