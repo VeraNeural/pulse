@@ -1,16 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import EditProfileModal from '../../components/EditProfileModal';
-import { VeraUpsellCard, VeraUpsellModal } from '../../components/VeraUpsell';
+import { VeraUpsellModal } from '../../components/VeraUpsell';
+import { PulsePlusModal } from '../../components/PulsePlusModal';
 
 export default function ProfilePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'posts' | 'gifts' | 'about'>('posts');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isVeraModalOpen, setIsVeraModalOpen] = useState(false);
+  const [isPulsePlusModalOpen, setIsPulsePlusModalOpen] = useState(false);
   const [quietMode, setQuietMode] = useState(false);
+  const [isPulsePlus, setIsPulsePlus] = useState(false);
+  const [isVeraPremium, setIsVeraPremium] = useState(false);
 
   // Load quiet mode on mount
   useState(() => {
@@ -18,6 +22,14 @@ export default function ProfilePage() {
       setQuietMode(localStorage.getItem('quietMode') === 'true');
     }
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setIsPulsePlus(localStorage.getItem('pulseplus_active') === 'true');
+    setIsVeraPremium(localStorage.getItem('vera_premium_active') === 'true');
+  }, []);
+
+  const isFreeUser = !isPulsePlus && !isVeraPremium;
 
   const toggleQuietMode = () => {
     const newValue = !quietMode;
@@ -97,6 +109,16 @@ export default function ProfilePage() {
         .empty-title { font-size: 1.1rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 8px; }
         .empty-text { color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; margin-bottom: 20px; }
         .create-post-btn { padding: 14px 32px; border-radius: 50px; background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); border: none; color: white; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+
+        .upgrade-wrap { margin: 0 16px 20px; }
+        .upgrade-status { margin: 0 16px 20px; padding: 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .status-title { font-size: 0.85rem; font-weight: 700; color: rgba(255, 255, 255, 0.92); margin-bottom: 6px; }
+        .status-sub { font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); }
+        .upgrade-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .upgrade-btn { width: 100%; padding: 14px 16px; border-radius: 16px; background: rgba(139, 92, 246, 0.08); border: 0.5px solid rgba(139, 92, 246, 0.25); color: rgba(255, 255, 255, 0.92); text-align: left; cursor: pointer; }
+        .upgrade-btn.secondary { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.12); }
+        .upgrade-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+        .upgrade-sub { font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); }
       `}</style>
 
       <div className="profile-page">
@@ -143,7 +165,28 @@ export default function ProfilePage() {
             <div className="quiet-toggle-knob" />
           </button>
         </div>
-        <VeraUpsellCard onSubscribe={() => setIsVeraModalOpen(true)} />
+
+        {isFreeUser ? (
+          <div className="upgrade-wrap">
+            <div className="upgrade-buttons">
+              <button className="upgrade-btn" onClick={() => setIsPulsePlusModalOpen(true)}>
+                <div className="upgrade-title">Upgrade to Pulse+ - $2.99/mo</div>
+                <div className="upgrade-sub">Unlimited posts + Spotlight priority</div>
+              </button>
+              <button className="upgrade-btn secondary" onClick={() => setIsVeraModalOpen(true)}>
+                <div className="upgrade-title">Get VERA Premium - $8/mo</div>
+                <div className="upgrade-sub">Full Sanctuary + Pulse+ + VERA AI</div>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="upgrade-status">
+            <div className="status-title">Subscription Active</div>
+            <div className="status-sub">
+              {isVeraPremium ? 'VERA Premium — $8/mo' : 'Pulse+ — $2.99/mo'}
+            </div>
+          </div>
+        )}
         <div className="tabs">
           <button className={`tab ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>Posts</button>
           <button className={`tab ${activeTab === 'gifts' ? 'active' : ''}`} onClick={() => setActiveTab('gifts')}>Gifts</button>
@@ -168,6 +211,12 @@ export default function ProfilePage() {
           onSubscribe={() => {
             setIsVeraModalOpen(false);
           }}
+        />
+
+        <PulsePlusModal
+          isOpen={isPulsePlusModalOpen}
+          onClose={() => setIsPulsePlusModalOpen(false)}
+          onVeraPremium={() => setIsVeraModalOpen(true)}
         />
       </div>
     </>

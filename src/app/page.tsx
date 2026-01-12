@@ -18,6 +18,9 @@ export default function FeedPage() {
   const [isBuyCoinsOpen, setIsBuyCoinsOpen] = useState(false);
   const [showVeraBanner, setShowVeraBanner] = useState(true);
   const [showLiftBanner, setShowLiftBanner] = useState(false);
+  const [showPulsePlusBanner, setShowPulsePlusBanner] = useState(false);
+  const [isPulsePlus, setIsPulsePlus] = useState(false);
+  const [isVeraPremium, setIsVeraPremium] = useState(false);
   const { coins, addCoins, subtractCoins } = useCoins();
 
   useEffect(() => {
@@ -34,8 +37,18 @@ export default function FeedPage() {
       if (lastShown !== today) {
         setShowLiftBanner(true);
       }
+
+      setIsPulsePlus(localStorage.getItem('pulseplus_active') === 'true');
+      setIsVeraPremium(localStorage.getItem('vera_premium_active') === 'true');
+
+      const pulsePlusDismissed = localStorage.getItem('pulsePlusUpsellDismissed') === 'true';
+      if (!pulsePlusDismissed) {
+        setShowPulsePlusBanner(true);
+      }
     }
   }, []);
+
+  const isFreeUser = !isPulsePlus && !isVeraPremium;
 
   const handleDismissLiftBanner = () => {
     setShowLiftBanner(false);
@@ -245,6 +258,44 @@ export default function FeedPage() {
           cursor: pointer;
           font-size: 1.2rem;
         }
+
+        .pulseplus-banner {
+          margin: 12px 16px;
+          padding: 14px 14px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(236, 72, 153, 0.08) 100%);
+          border: 1px solid rgba(139, 92, 246, 0.25);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .pulseplus-text {
+          flex: 1;
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.8);
+          line-height: 1.35;
+        }
+        .pulseplus-cta {
+          padding: 10px 14px;
+          border-radius: 999px;
+          background: rgba(139, 92, 246, 0.18);
+          border: 1px solid rgba(139, 92, 246, 0.35);
+          color: rgba(255, 255, 255, 0.92);
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+        .pulseplus-dismiss {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.08);
+          border: none;
+          color: rgba(255, 255, 255, 0.6);
+          cursor: pointer;
+          font-size: 1.1rem;
+        }
         .unseen-header {
           padding: 16px;
           text-align: center;
@@ -401,6 +452,26 @@ export default function FeedPage() {
                       isOwnPost={post.author.id === 'me'}
                       responsePosts={responsePosts}
                     />
+                    {index === 4 && isFreeUser && showPulsePlusBanner && (
+                      <div className="pulseplus-banner">
+                        <div className="pulseplus-text">
+                          Want unlimited posts? Upgrade to Pulse+ for <strong>$2.99/mo</strong>
+                        </div>
+                        <button className="pulseplus-cta" onClick={() => window.location.href = '/profile'}>
+                          Upgrade
+                        </button>
+                        <button
+                          className="pulseplus-dismiss"
+                          onClick={() => {
+                            setShowPulsePlusBanner(false);
+                            localStorage.setItem('pulsePlusUpsellDismissed', 'true');
+                          }}
+                          aria-label="Dismiss"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                     {index === 2 && showVeraBanner && (
                       <VeraUpsellBanner
                         onDismiss={() => setShowVeraBanner(false)}

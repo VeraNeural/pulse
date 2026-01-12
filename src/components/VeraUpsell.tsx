@@ -297,11 +297,11 @@ export function VeraUpsellCard({ onSubscribe }: VeraCardProps) {
         <div className="features-list">
           <div className="feature-item">
             <span className="feature-check">✓</span>
-            <span className="feature-text">7 Immersive healing rooms</span>
+            <span className="feature-text">Full Sanctuary (7 rooms)</span>
           </div>
           <div className="feature-item">
             <span className="feature-check">✓</span>
-            <span className="feature-text">Unlimited AI journaling</span>
+            <span className="feature-text">VERA AI (unlimited journaling)</span>
           </div>
           <div className="feature-item">
             <span className="feature-check">✓</span>
@@ -313,7 +313,7 @@ export function VeraUpsellCard({ onSubscribe }: VeraCardProps) {
           </div>
           <div className="feature-item">
             <span className="feature-check">✓</span>
-            <span className="feature-text">Priority support access</span>
+            <span className="feature-text">100 coins/month</span>
           </div>
         </div>
         
@@ -606,7 +606,7 @@ export function VeraUpsellModal({ isOpen, onClose, onSubscribe }: VeraModalProps
             <button className="subscribe-btn" onClick={handleSubscribe}>
               Start Your Journey ✨
             </button>
-            <p className="terms">7-day free trial • Cancel anytime</p>
+            <p className="terms">Full Sanctuary + Pulse+ + VERA AI + 100 coins/month</p>
           </div>
         </div>
       </div>

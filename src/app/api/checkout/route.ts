@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
+const PRICE_ID_VERA_PREMIUM = 'price_1SXmdPF8aJ0BDqA38uLdCp4f';
+const PRICE_ID_PULSE_PLUS = 'price_1SohlCF8aJ0BDqA3Oj0bwCsb';
+
 export async function POST(request: Request) {
   try {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -21,6 +24,13 @@ export async function POST(request: Request) {
     if (!origin) {
       return NextResponse.json({ error: 'Missing Origin header' }, { status: 400 });
     }
+
+    const subscriptionSuccessUrl =
+      priceId === PRICE_ID_VERA_PREMIUM
+        ? `${origin}/checkout/success?premium=true`
+        : priceId === PRICE_ID_PULSE_PLUS
+          ? `${origin}/checkout/success?pulseplus=true`
+          : `${origin}/checkout/success`;
     
     const session = await stripe.checkout.sessions.create({
       mode: checkoutMode,
@@ -28,7 +38,7 @@ export async function POST(request: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url:
         checkoutMode === 'subscription'
-          ? `${origin}/checkout/success?premium=true`
+          ? subscriptionSuccessUrl
           : `${origin}/checkout/success?coins=${coins}`,
       cancel_url: `${origin}/checkout/cancel`,
       metadata: { userId, coins: (coins ?? 0).toString() },

@@ -7,14 +7,24 @@ export default function CheckoutSuccess() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const premium = searchParams.get('premium');
+  const pulseplus = searchParams.get('pulseplus');
   const coins = searchParams.get('coins');
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (premium) {
+        localStorage.setItem('vera_premium_active', 'true');
+      }
+      if (pulseplus) {
+        localStorage.setItem('pulseplus_active', 'true');
+      }
+    }
+
     // Refresh user data after successful payment
     setTimeout(() => {
       window.location.reload();
     }, 3000);
-  }, []);
+  }, [premium, pulseplus]);
 
   return (
     <>
@@ -86,7 +96,13 @@ export default function CheckoutSuccess() {
           <>
             <div className="success-icon">🏛️</div>
             <h1 className="success-title">Welcome to VERA Premium!</h1>
-            <p className="success-message">Your Sanctuary is now fully unlocked</p>
+            <p className="success-message">Full Sanctuary unlocked • Pulse+ included • VERA AI • 100 coins/month</p>
+          </>
+        ) : pulseplus ? (
+          <>
+            <div className="success-icon">💜</div>
+            <h1 className="success-title">Welcome to Pulse+!</h1>
+            <p className="success-message">Unlimited posts • Spotlight priority • Custom badge • Exclusive hashtags</p>
           </>
         ) : (
           <>
