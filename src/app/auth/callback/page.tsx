@@ -16,6 +16,14 @@ export default function AuthCallbackPage() {
         if (error) throw error;
 
         if (session) {
+          const email = session.user.email;
+
+          if (!email) {
+            console.error('Auth callback: missing email on session user');
+            router.push('/login');
+            return;
+          }
+
           // Check if user profile exists
           const { data: existingProfile } = await supabase
             .from('users')
@@ -27,9 +35,9 @@ export default function AuthCallbackPage() {
           if (!existingProfile) {
             await supabase.from('users').insert({
               id: session.user.id,
-              email: session.user.email,
-              display_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || 'User',
-              avatar: session.user.user_metadata.avatar_url,
+              email,
+              display_name: session.user.user_metadata.full_name || email.split('@')[0] || 'User',
+              avatar: session.user.user_metadata.avatar_url ?? null,
               is_anonymous: false,
               coins: 100,
             });

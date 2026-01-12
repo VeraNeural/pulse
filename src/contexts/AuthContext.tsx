@@ -8,10 +8,11 @@ interface UserProfile {
   id: string;
   email: string;
   display_name: string;
-  avatar?: string;
+  avatar: string | null;
   is_anonymous: boolean;
   coins: number;
   created_at: string;
+  updated_at: string;
 }
 
 interface AuthContextType {
@@ -89,11 +90,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Insert user profile
       if (authData.user) {
+        const authEmail = authData.user.email;
+
+        if (!authEmail) {
+          throw new Error('Missing email on newly created user');
+        }
+
         const { error: profileError } = await supabase
           .from('users')
           .insert({
             id: authData.user.id,
-            email: authData.user.email,
+            email: authEmail,
             display_name: displayName,
             is_anonymous: false,
             coins: 100, // Starting coins

@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 export default function CheckoutSuccess() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const premium = searchParams.get('premium');
   const coins = searchParams.get('coins');
 
   useEffect(() => {
@@ -81,11 +82,21 @@ export default function CheckoutSuccess() {
       `}</style>
 
       <div className="success-page">
-        <div className="success-icon">🎉</div>
-        <h1 className="success-title">Payment Successful!</h1>
-        <p className="success-message">
-          <span className="coins-amount">🪙 {coins} coins</span> have been added to your account
-        </p>
+        {premium ? (
+          <>
+            <div className="success-icon">🏛️</div>
+            <h1 className="success-title">Welcome to VERA Premium!</h1>
+            <p className="success-message">Your Sanctuary is now fully unlocked</p>
+          </>
+        ) : (
+          <>
+            <div className="success-icon">🎉</div>
+            <h1 className="success-title">Payment Successful!</h1>
+            <p className="success-message">
+              <span className="coins-amount">🪙 {coins} coins</span> have been added to your account
+            </p>
+          </>
+        )}
         <button className="back-btn" onClick={() => router.push('/')}>
           Back to Pulse
         </button>

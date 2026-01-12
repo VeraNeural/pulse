@@ -7,15 +7,21 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { priceId, coins, userId } = await request.json();
+    const { priceId, coins, userId, mode } = await request.json();
+
+    const checkoutMode: 'payment' | 'subscription' = mode === 'subscription' ? 'subscription' : 'payment';
+    const origin = request.headers.get('origin');
     
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
+      mode: checkoutMode,
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${request.headers.get('origin')}/checkout/success?coins=${coins}`,
-      cancel_url: `${request.headers.get('origin')}/checkout/cancel`,
-      metadata: { userId, coins: coins.toString() },
+      success_url:
+        checkoutMode === 'subscription'
+          ? `${origin}/checkout/success?premium=true`
+          : `${origin}/checkout/success?coins=${coins}`,
+      cancel_url: `${origin}/checkout/cancel`,
+      metadata: { userId, coins: (coins ?? 0).toString() },
     });
     
     return NextResponse.json({ url: session.url });

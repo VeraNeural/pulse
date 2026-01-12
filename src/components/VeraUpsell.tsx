@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+
+const VERA_PREMIUM_PRICE_ID = 'price_1SXmdPF8aJ0BDqA38uLdCp4f';
 
 // VERA Upsell Banner - shows inline in feed
 interface VeraBannerProps {
@@ -124,6 +127,36 @@ interface VeraCardProps {
 }
 
 export function VeraUpsellCard({ onSubscribe }: VeraCardProps) {
+  const { user } = useAuth();
+
+  const handleSubscribe = async () => {
+    try {
+      if (!user) return;
+
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId: VERA_PREMIUM_PRICE_ID,
+          mode: 'subscription',
+          userId: user.id,
+        }),
+      });
+
+      const { url, error } = await response.json();
+
+      if (error) {
+        throw new Error(error);
+      }
+
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+    }
+  };
+
   return (
     <>
       <style jsx>{`
@@ -285,11 +318,11 @@ export function VeraUpsellCard({ onSubscribe }: VeraCardProps) {
         </div>
         
         <div className="pricing">
-          <span className="price">$9.99</span>
+          <span className="price">$8</span>
           <span className="price-period">/month</span>
         </div>
         
-        <button className="subscribe-btn" onClick={onSubscribe}>
+        <button className="subscribe-btn" onClick={handleSubscribe}>
           Unlock Sanctuary ✨
         </button>
         
@@ -307,6 +340,36 @@ interface VeraModalProps {
 }
 
 export function VeraUpsellModal({ isOpen, onClose, onSubscribe }: VeraModalProps) {
+  const { user } = useAuth();
+
+  const handleSubscribe = async () => {
+    try {
+      if (!user) return;
+
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId: VERA_PREMIUM_PRICE_ID,
+          mode: 'subscription',
+          userId: user.id,
+        }),
+      });
+
+      const { url, error } = await response.json();
+
+      if (error) {
+        throw new Error(error);
+      }
+
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -537,10 +600,10 @@ export function VeraUpsellModal({ isOpen, onClose, onSubscribe }: VeraModalProps
           
           <div className="cta-section">
             <div className="price-display">
-              <span className="price-amount">$9.99</span>
+              <span className="price-amount">$8</span>
               <span className="price-period">/month</span>
             </div>
-            <button className="subscribe-btn" onClick={onSubscribe}>
+            <button className="subscribe-btn" onClick={handleSubscribe}>
               Start Your Journey ✨
             </button>
             <p className="terms">7-day free trial • Cancel anytime</p>
