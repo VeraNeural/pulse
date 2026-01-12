@@ -35,14 +35,14 @@ export async function POST(request: Request) {
           .from('users')
           .select('coins')
           .eq('id', userId)
-          .single();
+          .single<{ coins: number }>();
 
-        if (fetchError) {
+        if (fetchError || !currentUser) {
           console.error('Error fetching user:', fetchError);
           return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        const newCoinsBalance = (currentUser?.coins || 0) + coinsToAdd;
+        const newCoinsBalance = currentUser.coins + coinsToAdd;
 
         const { error: updateError } = await supabase
           .from('users')
