@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function POST(request: Request) {
   try {
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
         const coinsToAdd = parseInt(coins, 10);
 
         // Update user's coins in Supabase
-        const { data: currentUser, error: fetchError } = await supabase
+        const { data: currentUser, error: fetchError } = await supabaseAdmin
           .from('users')
           .select('coins')
           .eq('id', userId)
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
         const newCoinsBalance = currentUser.coins + coinsToAdd;
 
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseAdmin
           .from('users')
           .update({ coins: newCoinsBalance })
           .eq('id', userId);
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
         // Insert transaction record (optional - requires coin_transactions table)
         try {
-          await supabase.from('coin_transactions').insert({
+          await supabaseAdmin.from('coin_transactions').insert({
             user_id: userId,
             amount: coinsToAdd,
             type: 'purchase',
