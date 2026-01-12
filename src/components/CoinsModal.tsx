@@ -56,7 +56,10 @@ export function BuyCoinsModal({ isOpen, onClose, balance, onPurchase }: CoinsMod
       // Redirect to Stripe checkout
       const stripe = await getStripe();
       if (stripe) {
-        await stripe.redirectToCheckout({ sessionId });
+        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
+        if (stripeError) {
+          throw new Error(stripeError.message);
+        }
       }
     } catch (error) {
       console.error('Purchase error:', error);
